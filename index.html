@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>La Habitación del Pánico - El Juego</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="orientation-warning">
+            <div class="warning-content">
+                <div class="rotate-icon">🔄</div>
+                <h2>GIRO DE PANTALLA</h2>
+                <p>Pon el móvil en horizontal para entrar en La Habitación del Pánico.</p>
+            </div>
+        </div>
+        
+        <div id="screen-start" class="screen">
+            <h1>LA HABITACIÓN DEL PÁNICO</h1>
+            <p>12 AÑOS DESPUÉS</p>
+            <p>17 DE AGOSTO DE 2014 — 17 DE AGOSTO DE 2026</p>
+            <div class="quote">"Una vaquilla. Un arcón. 60 segundos."</div>
+            <p><em>Basado en hechos reales.</em></p>
+            <button id="btn-start">EMPEZAR</button>
+        </div>
+
+        <div id="game-ui" class="hidden">
+            <div id="hud">
+                <div id="hud-score">PUNTOS: 0000</div>
+                <div id="hud-time">TIEMPO: 00:60</div>
+            </div>
+            <canvas id="game-canvas"></canvas>
+            <div id="controls">
+                <button id="btn-left">◀</button>
+                <button id="btn-right">▶</button>
+            </div>
+            <button id="btn-sound">🔊</button>
+        </div>
+
+        <div id="screen-gameover" class="hidden">
+            <h2 id="go-title">¡¡HA ENTRADO LA VAQUILLA!!</h2>
+            <div id="go-stats"></div>
+            <button id="btn-restart">VOLVER A JUGAR</button>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
