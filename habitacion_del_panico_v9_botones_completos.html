@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>La Habitación del Pánico - Arcade</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;touch-action:none;-webkit-touch-callout:none;user-select:none}
+html,body{background:#030308;color:#fff;font-family:'Press Start 2P',cursive;overflow:hidden;width:100vw;height:100vh;position:fixed}
+.scanlines{position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(rgba(18,16,16,0) 50%,rgba(0,0,0,.25) 50%),linear-gradient(90deg,rgba(255,0,0,.06),rgba(0,255,0,.02),rgba(0,0,255,.06));background-size:100% 4px,6px 100%;pointer-events:none;z-index:100}
+#game-container{width:100vw;height:100%;min-height:100%;position:relative;display:flex;flex-direction:column;background:#0a0a1a}
+.screen{position:absolute;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle,#16162d 0%,#080812 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:15px;z-index:20}
+.hidden{display:none!important}
+.logo-box-retro{width:90%;max-width:340px;padding:15px;margin-bottom:20px;border:4px solid #00ffff;background:#000;box-shadow:0 0 15px #00ffff;text-align:center}
+.logo-title{font-size:1.1rem;color:#3366ff;text-shadow:2px 2px #ff3333;line-height:1.4;margin-bottom:5px}
+.arcade-title-box{margin-bottom:20px}
+.neon-subtitle{font-size:.8rem;color:#ffcc00;margin-bottom:8px;text-shadow:0 0 8px #ffcc00}
+.dates-glow{font-size:.55rem;color:#00ffff;margin-bottom:12px;text-shadow:0 0 5px #00ffff}
+.quote-box{font-size:.65rem;color:#ff44aa;background:rgba(255,68,170,.1);padding:8px 12px;border:2px dashed #ff44aa;box-shadow:0 0 10px rgba(255,68,170,.3)}
+.arcade-btn{font-family:'Press Start 2P',cursive;background:linear-gradient(180deg,#ff3366 0%,#cc0033 100%);color:#fff;border:4px solid #fff;padding:16px 22px;cursor:pointer;font-size:.8rem;box-shadow:0 6px #660011,0 0 15px #ff3366;border-radius:8px}
+#game-header{width:100%;height:95px;min-height:95px;background:#05050f;padding:8px 15px;display:flex;flex-direction:column;align-items:center;border-bottom:2px solid #333366;z-index:10;flex-shrink:0}
+#top-info-bar{width:100%;display:flex;justify-content:space-between;font-size:.7rem;color:#00ffff;text-shadow:0 0 5px #00ffff;margin-bottom:6px}
+#bull-progress-container{width:100%;background:#000;border:2px solid #ff3333;padding:2px;text-align:center}
+#bull-progress-label{font-size:.4rem;color:#ff3333;margin-bottom:1px}
+#bull-progress-bar{width:100%;height:6px;background:#222}
+#bull-progress-fill{width:0%;height:100%;background:linear-gradient(90deg,#ffcc00,#ff3333)}
+#tension-msg{font-size:.55rem;color:#ffcc00;margin-top:4px;text-align:center;height:15px}
+#game-viewport{position:absolute;top:95px;left:0;right:0;bottom:185px;width:100%;background:#111125;overflow:hidden}
+#game-canvas{width:100%;height:100%;image-rendering:pixelated;display:block}
+#controls{position:absolute;left:0;right:0;bottom:55px;width:100%;height:105px;min-height:105px;background:#080816;display:flex;justify-content:space-between;align-items:center;padding:0 30px;border-top:2px solid #333366;z-index:50}
+.control-btn{width:130px;height:75px;font-size:2rem;font-family:'Press Start 2P',cursive;color:#fff;background:linear-gradient(180deg,#3366ff 0%,#0033cc 100%);border:3px solid #fff;border-radius:12px;box-shadow:0 5px #001166;display:flex;justify-content:center;align-items:center}
+.control-btn:active{background:linear-gradient(180deg,#2244cc 0%,#002299 100%);transform:translateY(3px);box-shadow:0 2px #001166}
+.neon-gameover{font-size:1.1rem;color:#ff3333;text-shadow:0 0 10px #ff3333,0 0 20px #ff0000;margin-bottom:12px;line-height:1.3}
+.story-sub{font-size:.6rem;color:#00ffff;margin:8px 0;line-height:1.5}
+.stats-box{font-size:.7rem;color:#fff;margin:10px 0;background:rgba(0,255,255,.05);border:1px solid #00ffff;padding:8px}
+.evaluation-box{font-size:.65rem;color:#ffcc00;background:rgba(255,204,0,.1);border:2px solid #ffcc00;padding:10px;margin:12px 0;max-width:90%;box-shadow:0 0 10px rgba(255,204,0,.2)}
+@media (max-width:600px){
+  #controls{height:100px;min-height:100px;padding:0 18px;bottom:14px;}
+  #game-viewport{bottom:114px;}
+  .control-btn{width:120px;height:72px;font-size:1.8rem;}
+}
+@media (max-width: 600px){
+    #controls{bottom:60px;height:100px;min-height:100px;padding:0 28px}
+    .control-btn{width:125px;height:72px}
+    #game-viewport{bottom:170px}
+}
+</style>
+</head>
+<body>
+<div class="scanlines"></div>
+<div id="game-container">
+<div id="screen-start" class="screen">
+<div class="logo-box-retro"><div class="logo-title">LA HABITACIÓN<br>DEL PÁNICO</div><div style="font-size:.5rem;color:#fff;margin-top:8px">DESDE 1998</div></div>
+<div class="arcade-title-box"><div class="neon-subtitle">12 AÑOS DESPUÉS</div><div class="dates-glow">17 AGO 2014 — 17 AGO 2026</div><div class="quote-box">"Una vaquilla. Un arcón. 30 segundos."</div></div>
+<button id="btn-start" class="arcade-btn">TOCA PARA EMPEZAR</button>
+</div>
+<div id="game-ui" class="hidden" style="position:absolute;inset:0;width:100%;height:100%;display:block;z-index:10">
+<div id="game-header"><div id="top-info-bar"><span id="hud-score">PTS: 0000</span><span id="hud-time">00:30</span></div><div id="bull-progress-container"><div id="bull-progress-label">⚠️ VAQUILLA ACECHANDO ⚠️</div><div id="bull-progress-bar"><div id="bull-progress-fill"></div></div></div><div id="tension-msg"></div></div>
+<div id="game-viewport"><canvas id="game-canvas"></canvas></div>
+<div id="controls"><button id="btn-left" class="control-btn">◀</button><button id="btn-right" class="control-btn">▶</button></div>
+</div>
+<div id="screen-gameover" class="screen hidden">
+<h2 id="go-title" class="neon-gameover">¡¡HA ENTRADO LA VAQUILLA!!</h2>
+<div class="story-sub">17 de agosto de 2014<br>12 años después...<br>El arcón salvó el día.</div>
+<div id="go-stats" class="stats-box"></div><div id="go-evaluation" class="evaluation-box"></div>
+<button id="btn-restart" class="arcade-btn">TOCA PARA REINICIAR</button>
+</div>
+</div>
+<script>
+const CONFIG={GAME_DURATION:30,PLAYER_SPEED:9,INITIAL_FALL_SPEED:4,SPAWN_RATE:750};
+let state={score:0,time:CONFIG.GAME_DURATION,isPlaying:false,playerX:0,objects:[],keys:{left:false,right:false},record:localStorage.getItem('panico_record_v6')||0,tensionText:"",animatingFinal:false};
+let finalState={frames:0,vaquillaX:-180,playerHidden:false,arconOpen:false};
+const canvas=document.getElementById('game-canvas'),ctx=canvas.getContext('2d');
+const AudioContext=window.AudioContext||window.webkitAudioContext;let audioCtx;
+function initAudio(){if(!audioCtx)audioCtx=new AudioContext();if(audioCtx.state==='suspended')audioCtx.resume()}
+function playSound(type){if(!audioCtx)return;const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.connect(gain);gain.connect(audioCtx.destination);if(type==='catch'){osc.type='square';osc.frequency.setValueAtTime(900,audioCtx.currentTime);osc.frequency.exponentialRampToValueAtTime(1400,audioCtx.currentTime+.1);gain.gain.setValueAtTime(.1,audioCtx.currentTime);gain.gain.exponentialRampToValueAtTime(.01,audioCtx.currentTime+.1);osc.start();osc.stop(audioCtx.currentTime+.1)}else if(type==='moo'){osc.type='sawtooth';osc.frequency.setValueAtTime(160,audioCtx.currentTime);osc.frequency.exponentialRampToValueAtTime(60,audioCtx.currentTime+1.2);gain.gain.setValueAtTime(.4,audioCtx.currentTime);gain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+1.2);osc.start();osc.stop(audioCtx.currentTime+1.2)}}
+function init(){resizeCanvas();window.addEventListener('resize',resizeCanvas);document.getElementById('btn-start').onclick=startGame;document.getElementById('btn-restart').onclick=startGame;
+window.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='a')state.keys.left=true;if(e.key==='ArrowRight'||e.key==='d')state.keys.right=true});
+window.addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key==='a')state.keys.left=false;if(e.key==='ArrowRight'||e.key==='d')state.keys.right=false});
+const bl=document.getElementById('btn-left'),br=document.getElementById('btn-right');
+bl.onpointerdown=e=>{e.preventDefault();state.keys.left=true};bl.onpointerup=e=>{e.preventDefault();state.keys.left=false};bl.onpointercancel=()=>state.keys.left=false;bl.onpointerleave=()=>state.keys.left=false;
+br.onpointerdown=e=>{e.preventDefault();state.keys.right=true};br.onpointerup=e=>{e.preventDefault();state.keys.right=false};br.onpointercancel=()=>state.keys.right=false;br.onpointerleave=()=>state.keys.right=false;
+requestAnimationFrame(gameLoop)}
+function resizeCanvas(){const v=document.getElementById('game-viewport');canvas.width=v.clientWidth;canvas.height=v.clientHeight;if(state.playerX===0)state.playerX=canvas.width/2-30}
+function startGame(){initAudio();state.score=0;state.time=CONFIG.GAME_DURATION;state.isPlaying=true;state.objects=[];state.animatingFinal=false;state.playerX=canvas.width/2-30;finalState={frames:0,vaquillaX:-180,playerHidden:false,arconOpen:false};document.getElementById('screen-start').classList.add('hidden');document.getElementById('screen-gameover').classList.add('hidden');document.getElementById('game-ui').classList.remove('hidden');resizeCanvas();document.getElementById('hud-score').innerText='PTS: 0000';document.getElementById('hud-time').innerText='00:30';document.getElementById('bull-progress-fill').style.width='0%';document.getElementById('tension-msg').innerText='';
+const spawner=setInterval(()=>{if(state.isPlaying&&!state.animatingFinal){state.objects.push({x:Math.random()*(canvas.width-50),y:-50,speed:CONFIG.INITIAL_FALL_SPEED+(CONFIG.GAME_DURATION-state.time)*.15})}else if(!state.isPlaying&&!state.animatingFinal)clearInterval(spawner)},CONFIG.SPAWN_RATE);
+const timer=setInterval(()=>{if(state.isPlaying&&!state.animatingFinal){state.time--;updateTensionMessage();if(state.time<=0){triggerFinalSequence();clearInterval(timer)}}else if(!state.isPlaying&&!state.animatingFinal)clearInterval(timer)},1000)}
+function updateTensionMessage(){const t=state.time;if(t===25)state.tensionText='TODO CONTROLADO EN LA PEÑA.';else if(t===20)state.tensionText='SUENAN LAS COPAS EN LA BARRA...';else if(t===15)state.tensionText='¡SE ESCUCHAN RUIDOS AFUERA!';else if(t===10)state.tensionText='¡¡ALGUIEN DEJÓ LA PUERTA ABIERTA!!';else if(t<=5&&t>0)state.tensionText='¡¡¡QUE VIENE LA VAQUILLA!!!';else if(t===0)state.tensionText='¡¡AL ARCÓN!!'}
+function update(){if(!state.isPlaying)return;if(state.animatingFinal){finalState.frames++;if(finalState.frames<80)finalState.vaquillaX+=6;else finalState.vaquillaX+=1.5;const arconTarget=canvas.width-105;if(finalState.frames>30&&!finalState.playerHidden&&state.playerX<arconTarget)state.playerX+=12;finalState.arconOpen=finalState.frames>50&&finalState.frames<110;if(finalState.frames>75)finalState.playerHidden=true;if(finalState.frames>220)endGame();return}
+if(state.keys.left&&state.playerX>10)state.playerX-=CONFIG.PLAYER_SPEED;if(state.keys.right&&state.playerX<canvas.width-70)state.playerX+=CONFIG.PLAYER_SPEED;const floorY=canvas.height-70;
+for(let i=state.objects.length-1;i>=0;i--){const obj=state.objects[i];obj.y+=obj.speed;if(obj.y>floorY-60&&obj.y<floorY&&obj.x>state.playerX-25&&obj.x<state.playerX+55){state.score++;playSound('catch');state.objects.splice(i,1);document.getElementById('hud-score').innerText=`PTS: ${state.score.toString().padStart(4,'0')}`;continue}if(obj.y>canvas.height)state.objects.splice(i,1)}
+document.getElementById('hud-time').innerText=`00:${state.time.toString().padStart(2,'0')}`;document.getElementById('bull-progress-fill').style.width=`${((CONFIG.GAME_DURATION-state.time)/CONFIG.GAME_DURATION)*100}%`;document.getElementById('tension-msg').innerText=state.tensionText}
+function triggerFinalSequence(){state.animatingFinal=true;playSound('moo');state.tensionText='¡¡ENTRA LA VAQUILLA A LA PEÑA!!'}
+function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);const floorY=canvas.height-70;ctx.fillStyle='#151528';ctx.fillRect(0,0,canvas.width,floorY);
+ctx.fillStyle='#8aa4b8';ctx.fillRect(canvas.width/2-110,10,220,floorY-10);ctx.strokeStyle='#445566';ctx.lineWidth=4;ctx.strokeRect(canvas.width/2-110,10,220,floorY-10);ctx.lineWidth=2;
+for(let i=35;i<floorY;i+=25){ctx.beginPath();ctx.moveTo(canvas.width/2-110,i);ctx.lineTo(canvas.width/2+110,i);ctx.stroke()}
+ctx.fillStyle='#000';ctx.font="8px 'Press Start 2P'";ctx.textAlign='center';ctx.fillText('LA HABITACIÓN',canvas.width/2,40);ctx.fillText('DEL PÁNICO',canvas.width/2,55);
+ctx.fillStyle='#262640';ctx.fillRect(0,floorY,canvas.width,70);ctx.strokeStyle='#ff3366';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,floorY);ctx.lineTo(canvas.width,floorY);ctx.stroke();
+const arconX=canvas.width-100,arconY=floorY-45;ctx.fillStyle='#fff';ctx.fillRect(arconX,arconY,80,45);ctx.strokeStyle='#333366';ctx.lineWidth=2;ctx.strokeRect(arconX,arconY,80,45);let lidY=arconY-18;if(finalState.arconOpen)lidY-=22;ctx.fillStyle='#d0d0ff';ctx.fillRect(arconX+5,lidY,70,18);ctx.strokeRect(arconX+5,lidY,70,18);ctx.fillStyle='#000';ctx.font="7px 'Press Start 2P'";ctx.fillText('ICE',arconX+40,lidY+13);
+if(!finalState.playerHidden){const skin='#ffccaa';ctx.fillStyle=skin;ctx.fillRect(state.playerX+5,floorY-65,20,18);ctx.fillRect(state.playerX-8,floorY-65,8,22);ctx.fillRect(state.playerX+30,floorY-65,8,22);ctx.fillStyle='#fff';ctx.fillRect(state.playerX,floorY-47,30,24);ctx.fillStyle='#113399';ctx.fillRect(state.playerX,floorY-23,30,14);ctx.fillStyle=skin;ctx.fillRect(state.playerX+4,floorY-9,8,9);ctx.fillRect(state.playerX+18,floorY-9,8,9)}
+if(state.animatingFinal){const vx=finalState.vaquillaX,vy=floorY-65;ctx.fillStyle='#1c1c1c';ctx.fillRect(vx,vy,110,60);ctx.fillRect(vx+80,vy-25,40,40);ctx.fillStyle='#fff';ctx.fillRect(vx+95,vy-42,10,20);ctx.fillRect(vx+115,vy-42,10,20);ctx.fillStyle='#ffcc00';ctx.fillRect(vx+102,vy-15,6,6);ctx.fillStyle='#000';ctx.fillRect(vx+104,vy-13,2,2);ctx.fillStyle='#ff9999';ctx.fillRect(vx+112,vy-2,10,10);ctx.fillStyle='#1c1c1c';ctx.fillRect(vx+15,vy+60,14,15);ctx.fillRect(vx+45,vy+60,14,15);ctx.fillRect(vx+75,vy+60,14,15)}
+if(!state.animatingFinal)state.objects.forEach(obj=>{ctx.fillStyle='rgba(180,220,255,.6)';ctx.fillRect(obj.x,obj.y,22,34);ctx.fillStyle='rgba(255,200,0,.8)';ctx.fillRect(obj.x+2,obj.y+12,18,20);ctx.fillStyle='rgba(255,255,255,.9)';ctx.fillRect(obj.x+4,obj.y+14,8,8);ctx.fillRect(obj.x+10,obj.y+22,8,8);ctx.fillStyle='rgba(255,255,255,.4)';ctx.fillRect(obj.x+2,obj.y+2,4,30)})}
+function gameLoop(){update();draw();requestAnimationFrame(gameLoop)}
+function endGame(){state.isPlaying=false;document.getElementById('game-ui').classList.add('hidden');document.getElementById('screen-gameover').classList.remove('hidden');if(state.score>state.record){state.record=state.score;localStorage.setItem('panico_record_v6',state.record)}let evaluacion='';const s=state.score;if(s<=10)evaluacion='LA VAQUILLA GANÓ POR GOLEADA.';else if(s<=20)evaluacion='BUENO... AL MENOS SALVASTE ALGÚN VASO.';else if(s<=35)evaluacion='SUPERVIVIENTE DE LA HABITACIÓN DEL PÁNICO.';else if(s<=50)evaluacion='LEYENDA DE LA PEÑA.';else evaluacion='¡NI LA VAQUILLA SE ATREVE CONTIGO!';document.getElementById('go-stats').innerHTML=`PUNTUACIÓN: ${state.score}<br><br>RÉCORD: ${state.record}`;document.getElementById('go-evaluation').innerText=`"${evaluacion}"`}
+init();
+</script>
+</body>
+</html>
